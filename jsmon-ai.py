@@ -19,6 +19,13 @@ from AI.change_analyzer import ChangeAnalyzer
 from AI.diff_manager import DiffManager
 from AI.notification_manager import NotificationManager
 
+# --- Pre-flight Directory Setup ---
+# Ensure all necessary directories exist before any other code runs.
+Path(LOGS_DIR).mkdir(exist_ok=True)
+Path(AI_LOGS_DIR).mkdir(parents=True, exist_ok=True)
+Path(TARGETS_DIR).mkdir(exist_ok=True)
+
+
 # Setup logging configuration
 logger = logging.getLogger('JSMon.ai')
 logger.setLevel(logging.INFO)
@@ -62,11 +69,6 @@ except Exception as e:
     storage_manager = None
 
 # --- Helper Functions ---
-def ensure_directories() -> None:
-    """Create all required directories if they don't exist."""
-    for directory in [LOGS_DIR, AI_LOGS_DIR]:
-        Path(directory).mkdir(parents=True, exist_ok=True)
-
 def log_ai_response(response_type: str, js_url: str, file_hash: str, content: Any, metadata: Optional[Dict[str, Any]] = None) -> None:
     """Log AI responses to files for debugging and auditing."""
     if not LOG_AI_RESPONSES:
@@ -117,51 +119,7 @@ def get_js_file(js_url: str) -> str:
     except requests.exceptions.RequestException as e:
         raise Exception(f"Failed to fetch {js_url}: {str(e)}")
 
-def _generate_summary_html(detailed_analysis: Dict[str, Any]) -> str:
-    """Generate a styled HTML report from a detailed analysis dictionary."""
-    html_body_parts = []
-    if isinstance(detailed_analysis, dict):
-        for section_title, section_data in detailed_analysis.items():
-            html_body_parts.append('<div class="section">')
-            html_body_parts.append(f'<h2>{section_title.replace("_", " ").title()}</h2>')
-            if isinstance(section_data, dict):
-                html_body_parts.append('<dl>')
-                for key, value in section_data.items():
-                    html_body_parts.append(f'<dt>{key.replace("_", " ").title()}</dt>')
-                    html_body_parts.append(f'<dd>{value}</dd>')
-                html_body_parts.append('</dl>')
-            else:
-                html_body_parts.append(f'<p>{section_data}</p>')
-            html_body_parts.append('</div>')
-    else:
-        html_body_parts.append(f"<pre>{json.dumps(detailed_analysis, indent=2)}</pre>")
-    
-    analysis_html_body = "\n".join(html_body_parts)
-    
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Change Analysis</title>
-    <style>
-        body {{ background-color: #121212; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; }}
-        .container {{ max-width: 900px; margin: 0 auto; background-color: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 25px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }}
-        h1 {{ color: #bb86fc; border-bottom: 2px solid #bb86fc; padding-bottom: 10px; margin-top: 0; }}
-        .section {{ background-color: #2c2c2c; border-radius: 5px; padding: 20px; margin-bottom: 20px; }}
-        .section h2 {{ color: #bb86fc; margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; font-size: 1.2em; }}
-        dl {{ margin: 0; padding: 0; }}
-        dt {{ color: #9e9e9e; font-weight: bold; text-transform: capitalize; margin-top: 15px; }}
-        dd {{ color: #e0e0e0; margin-left: 20px; margin-bottom: 10px; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>AI Analysis Details</h1>
-        {analysis_html_body}
-    </div>
-</body>
-</html>"""
+
 
 # --- Notification Orchestration ---
 def notify_change(js_url: str, prev_hash: str, new_hash: str) -> None:
@@ -231,7 +189,6 @@ def main() -> None:
         logger.critical("StorageManager failed to initialize. Application cannot continue.")
         sys.exit(1)
 
-    ensure_directories()
     
     js_files = get_js_file_list(TARGETS_DIR)
     if not js_files:
