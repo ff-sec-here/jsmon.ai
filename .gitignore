@@ -1,0 +1,19 @@
+# Environment variables
+.env
+
+# Python virtual environment
+.venv/
+
+# Application-generated data
+/monitored_files/
+/logs/
+
+# User-specific data (add your own URLs here)
+/targets/
+
+# Test files
+/test/
+
+# Python cache
+__pycache__/
+*.pyc
