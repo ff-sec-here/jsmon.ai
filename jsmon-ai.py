@@ -19,6 +19,14 @@ from AI.change_analyzer import ChangeAnalyzer
 from AI.diff_manager import DiffManager
 from AI.notification_manager import NotificationManager
 
+# --- Configuration ---
+TARGETS_DIR = "targets"
+LOGS_DIR = "logs"
+AI_LOGS_DIR = "logs/ai_conversations"
+AUTO_GENERATE_SUMMARIES = config("AUTO_GENERATE_SUMMARIES", default=True, cast=bool)
+MAX_DIFF_SIZE = config("MAX_DIFF_SIZE", default=50000, cast=int)
+LOG_AI_RESPONSES = config("LOG_AI_RESPONSES", default=True, cast=bool)
+
 # --- Pre-flight Directory Setup ---
 # Ensure all necessary directories exist before any other code runs.
 Path(LOGS_DIR).mkdir(exist_ok=True)
