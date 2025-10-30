@@ -33,7 +33,7 @@ def check_and_install_dependencies():
             return False
 
 def setup_jsmon_ai():
-    """Setup script for JSMon.ai features."
+    """Setup script for JSMon.ai features."""
     print("JSMon.ai Setup")
 
     # 1. Check dependencies
