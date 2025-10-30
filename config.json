@@ -1,0 +1,12 @@
+{
+  "summarization": {
+    "model": "gemini-2.5-pro",
+    "max_tokens": 8192,
+    "temperature": 0.3
+  },
+  "code_analysis": {
+    "model": "gemini-2.5-pro",
+    "max_tokens": 8192,
+    "temperature": 0.6
+  }
+}
